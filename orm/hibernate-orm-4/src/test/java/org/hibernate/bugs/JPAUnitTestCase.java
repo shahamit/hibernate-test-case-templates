@@ -1,38 +1,63 @@
 package org.hibernate.bugs;
 
+import org.hibernate.lists.Credentials;
+import org.hibernate.lists.GenericConnection;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This template demonstrates how to develop a test case for Hibernate ORM, using the Java Persistence API.
  */
 public class JPAUnitTestCase {
 
-	private EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
 
-	@Before
-	public void init() {
-		entityManagerFactory = Persistence.createEntityManagerFactory( "templatePU" );
-	}
+    @Before
+    public void init() {
+        entityManagerFactory = Persistence.createEntityManagerFactory( "templatePU" );
+    }
 
-	@After
-	public void destroy() {
-		entityManagerFactory.close();
-	}
+    @After
+    public void destroy() {
+        entityManagerFactory.close();
+    }
 
-	// Entities are auto-discovered, so just add them anywhere on class-path
-	// Add your tests, using standard JUnit.
-	@Test
-	public void hhh123Test() throws Exception {
-		EntityManager entityManager = entityManagerFactory.createEntityManager();
-		entityManager.getTransaction().begin();
-		// Do stuff...
-		entityManager.getTransaction().commit();
-		entityManager.close();
-	}
+    // Entities are auto-discovered, so just add them anywhere on class-path
+    // Add your tests, using standard JUnit.
+    @Test
+    public void readObjectWithList() throws Exception {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        GenericConnection connection = new GenericConnection();
+        connection.setName("Oracle Connection");
+        connection.setUrl("<jdbc-url>");
+
+        List<Credentials> credentials = new ArrayList<>();
+        final Credentials c1 = new Credentials();
+        c1.setCredId("user1");
+        c1.setEncryptedPassword("oghjero");
+        credentials.add(c1);
+        connection.setCredentials(credentials);
+
+        saveConnection(entityManager, connection);
+
+        Assert.assertNotNull(entityManager.find(GenericConnection.class, connection.getId()));
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
+    private void saveConnection(EntityManager entityManager, GenericConnection connection) {
+        entityManager.persist(connection);
+        entityManager.flush();
+        entityManager.detach(connection);
+    }
 }
