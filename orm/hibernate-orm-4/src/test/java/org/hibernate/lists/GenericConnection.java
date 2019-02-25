@@ -3,6 +3,7 @@ package org.hibernate.lists;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shahamit
@@ -26,7 +27,24 @@ public class GenericConnection {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "DSC_DS_ID", nullable = false)
     @OrderColumn(name = "DSC_ORDER", updatable = false, insertable = false)
-    private List<Credentials> credentials = new ArrayList<>(); //If we change this mapping to a Set, everything works fine.
+    private List<Credentials> credentials = new ArrayList<>();
+
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "PARAMETERS",
+            joinColumns = @JoinColumn(name = "PARAMETER_ID"))
+    @MapKeyColumn(name = "PARAMETER_NAME", insertable = false, updatable = false)
+    @Column(name = "PARAMETER_VALUE")
+    private Map<String, String> parameters;
+
+    public Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+    }
+
 
     public String getUrl() {
         return url;

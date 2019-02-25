@@ -11,7 +11,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This template demonstrates how to develop a test case for Hibernate ORM, using the Java Persistence API.
@@ -47,6 +49,11 @@ public class JPAUnitTestCase {
         c1.setEncryptedPassword("oghjero");
         credentials.add(c1);
         connection.setCredentials(credentials);
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("P1", "V1");
+
+        connection.setParameters(parameters);
 
         saveConnection(entityManager, connection);
 
